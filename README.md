@@ -2,7 +2,7 @@
 University homework.
 
 TODO:
-Pland:
+Plan:
 - Open and read file
 - Make a linked list of the barbers
 - Make a linked list of the customers
