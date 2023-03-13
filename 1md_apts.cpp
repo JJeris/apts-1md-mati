@@ -78,11 +78,34 @@ void createList(Node** headRef, int n) {
 }
 
 int main() {
-    int n = 6;
+
+    // Open the file
+    ifstream file("hair.in");
+    // Check if the file was opened successfully
+    if (!file.is_open())
+    {
+        cout << "Failed to open file." << endl;
+        return 1;
+    }
+    int n;
+    file >> n;
+
+    // Output the first line to the console
+    cout << "The number of barbers: " << n << endl;
+
+    // int n = 6;
     Node* head = nullptr;
     createList(&head, n);
     traverseList(head);
     deleteList(&head);
+    // return 0;
+    int num;
+    while (file >> num)
+    {
+        cout << "Number: " << num << endl;
+    }
+    file.close();
+    
     return 0;
 }
 
