@@ -1,20 +1,16 @@
 /**
-*Nr 1-9
+Nr 1-9
 Laiks 2 000 000 000
 Atpūšas, kad simtnieku pozīcijas cipas sakrīt ar nr: 5 un 500-590, 1500-1599 utt
-
-
 out - k beigu moments, f nr., k nr.
 secīgi laikam pieaugot. Ja vienā laika momentā beidz apkalpot vairākus klientus, tad rezultāti jādrukā frizieru numuru secībā.
- **/
+**/
 
 #include <iostream>
 #include <fstream>
 using namespace std;
 
-
-// Definition of a Node struct with an integer value and a pointer to the next Node.
-// Used to construct a linked list.
+// Definition of a Node struct with an integer value and a pointer to the next Node. Used to construct a linked list.
 struct Node {
     int value;
     Node* next;
@@ -24,7 +20,7 @@ struct Node {
 void traverseList(Node* head) {
     Node* current = head;
     while (current != nullptr) {
-        std::cout << current->value << " ";
+        cout << current->value << " ";
         current = current->next;
     }
 }
@@ -77,34 +73,68 @@ void createList(Node** headRef, int n) {
     // }
 }
 
-int main() {
+// Function to append a new node to the end of a linked-list.
+void addElement(Node** headRef, int value) {
+    Node* newNode = new Node;
+    newNode->value = value;
+    newNode->next = nullptr;
 
-    // Open the file
-    ifstream file("hair.in");
+    if (*headRef == nullptr) {
+        *headRef = newNode;
+    }
+    else {
+        Node* current = *headRef;
+        while (current->next != nullptr) {
+            current = current->next;
+        }
+        current->next = newNode;
+    }
+}
+
+int main() {
+    // Global variables
+    long int time = 2000000000;
+    cout << time << endl;
+
+    // Open the files
+    ifstream input("hair.in");
+    ofstream output("hair.out");
+
     // Check if the file was opened successfully
-    if (!file.is_open())
+    if (!input.is_open())
     {
-        cout << "Failed to open file." << endl;
+        cout << "Failed to open input file." << endl;
         return 1;
     }
+    if (!output.is_open())
+    {
+        cout << "Failed to open output file." << std::endl;
+        return 1;
+    }
+
     int n;
-    file >> n;
+    input >> n;
 
     // Output the first line to the console
     cout << "The number of barbers: " << n << endl;
+    output << n << endl;
 
-    // int n = 6;
     Node* head = nullptr;
     createList(&head, n);
     traverseList(head);
+    cout << endl;
+    addElement(&head, 69);
+    traverseList(head);
+    cout << endl;
     deleteList(&head);
     // return 0;
     int num;
-    while (file >> num)
+    while (input >> num)
     {
         cout << "Number: " << num << endl;
+        output << num << endl;
     }
-    file.close();
+    input.close();
     
     return 0;
 }
