@@ -91,6 +91,90 @@ void addElement(Node** headRef, int value) {
     }
 }
 
+void seperateLists(){
+    // Create the first linked-list
+    Node* head1 = nullptr;
+    createList(&head1, 5);
+
+    // Create the second linked-list
+    Node* head2 = nullptr;
+    addElement(&head2, 10);
+    addElement(&head2, 20);
+    addElement(&head2, 30);
+
+    // Add an element from list1 to list2
+    Node* current = head1;
+    while (current != nullptr && current->value != 3) {
+        current = current->next;
+    }
+
+    if (current != nullptr) {
+        addElement(&head2, current->value);
+    }
+}
+
+
+// Definition of a Node struct with three integer values and a pointer to the next Node.
+struct Node1 {
+    int time;
+    int num;
+    int duration;
+    Node1* next;
+};
+
+// Traverse the linked list and print out each value
+void traverseList(Node1* head) {
+    Node1* current = head;
+    while (current != nullptr) {
+        std::cout << "Time: " << current->time << ", ";
+        std::cout << "Num: " << current->num << ", ";
+        std::cout << "Duration: " << current->duration << std::endl;
+        current = current->next;
+    }
+}
+
+// Delete the nodes in the linked list
+void deleteList(Node1** headRef) {
+    Node1* current = *headRef;
+    while (current != nullptr) {
+        Node1* temp = current;
+        current = current->next;
+        delete temp;
+    }
+    *headRef = nullptr;
+}
+
+void appendToList(Node1** headRef, int time, int num, int duration) {
+    Node1* newNode = new Node1;
+    newNode->time = time;
+    newNode->num = num;
+    newNode->duration = duration;
+    newNode->next = nullptr;
+
+    if (*headRef == nullptr) {
+        *headRef = newNode;
+    }
+    else {
+        Node1* current = *headRef;
+        while (current->next != nullptr) {
+            current = current->next;
+        }
+        current->next = newNode;
+    }
+}
+void demoClientList(){
+    Node1* head = nullptr;
+    appendToList(&head, 10, 1, 100);
+    appendToList(&head, 20, 2, 200);
+    appendToList(&head, 30, 3, 300);
+    traverseList(head);
+    deleteList(&head);
+
+}
+
+
+
+
 int main() {
     // Global variables
     long int time = 2000000000;
