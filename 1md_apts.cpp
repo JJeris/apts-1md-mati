@@ -91,6 +91,7 @@ void addElement(Node** headRef, int value) {
     }
 }
 
+// DEMO
 void seperateLists(){
     // Create the first linked-list
     Node* head1 = nullptr;
@@ -162,6 +163,8 @@ void appendToList(Node1** headRef, int time, int num, int duration) {
         current->next = newNode;
     }
 }
+
+// DEMO
 void demoClientList(){
     Node1* head = nullptr;
     appendToList(&head, 10, 1, 100);
@@ -178,7 +181,7 @@ void demoClientList(){
 int main() {
     // Global variables
     long int time = 2000000000;
-    cout << time << endl;
+    cout << "Max time: " << time << endl;
 
     // Open the files
     ifstream input("hair.in");

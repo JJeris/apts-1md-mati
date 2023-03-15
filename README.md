@@ -11,3 +11,9 @@ Plan:
 - Make a linked list of the customers TODO
 - Global variable for the time TODO
 - Run the program (misc functions) TODO update
+
+
+
+
+Need a function that removes a single element from a linked list
+                                                                                                                                                                                
