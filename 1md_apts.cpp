@@ -126,6 +126,52 @@ void appendToList(Node1** headRef, int time, int num, int duration) {
     }
 }
 
+struct Node2 {
+    int spentTime;
+    int barberNum;
+    int clientNum;
+    Node2* next;
+};
+
+void traverseList(Node2* head) {
+    Node2* current = head;
+    while (current != nullptr) {
+        std::cout << "Spent Time: " << current->spentTime << ", ";
+        std::cout << "Barber Num: " << current->barberNum << ", ";
+        std::cout << "Client Num: " << current->clientNum << std::endl;
+        current = current->next;
+    }
+}
+
+void addElement(Node2** headRef, int spentTime, int barberNum, int clientNum) {
+    Node2* newNode = new Node2;
+    newNode->spentTime = spentTime;
+    newNode->barberNum = barberNum;
+    newNode->clientNum = clientNum;
+    newNode->next = nullptr;
+
+    if (*headRef == nullptr) {
+        *headRef = newNode;
+    }
+    else {
+        Node2* current = *headRef;
+        while (current->next != nullptr) {
+            current = current->next;
+        }
+        current->next = newNode;
+    }
+}
+
+void deleteList(Node2** headRef) {
+    Node2* current = *headRef;
+    while (current != nullptr) {
+        Node2* temp = current;
+        current = current->next;
+        delete temp;
+    }
+    *headRef = nullptr;
+}
+
 int main() {
     // Global variables
     long int MAX_TIME = 2000000000;
@@ -162,8 +208,8 @@ int main() {
     createList(&head, n);
     traverseList(head);
     cout << endl;
-    deleteList(&head);
-
+    
+    // Create a linked list of clients
     Node1* head1 = nullptr; 
     int time; 
     int num; 
@@ -173,12 +219,31 @@ int main() {
         appendToList(&head1, time, num, duration);
     }
     traverseList(head1);
-    deleteList(&head1);
-
-
-
-
     
+
+    Node2* head2 = nullptr;
+
+    addElement(&head2, 20, 1, 1);
+    addElement(&head2, 50, 1, 3);
+    addElement(&head2, 70, 2, 2);
+
+    // Traverse the list and write values to file
+    Node2* current = head2;
+    while (current != nullptr) {
+        output << current->spentTime << " ";
+        output << current->barberNum << " ";
+        output << current->clientNum << std::endl;
+        current = current->next;
+    }
+
+    // Close the file
+    input.close();
+    output.close();
+
+    // Free memory
+    deleteList(&head);
+    deleteList(&head1);
+    deleteList(&head2);
     return 0;
 }
 
