@@ -5,7 +5,8 @@ using namespace std;
 // Definition of a Barber struct with an integer value and a pointer to the next Node. Used to construct a linked list.
 struct Barber {
     int numB;
-    bool onBreak;
+    int lastWorkTime = 0;
+    bool onBreak = false;
     Barber* next;
 };
 
@@ -14,6 +15,7 @@ void traverseList(Barber* head) {
     Barber* current = head;
     while (current != nullptr) {
         cout << current->numB << " ";
+        cout << current->lastWorkTime << " ";
         cout << current->onBreak << " " << endl;
         current = current->next;
     }
@@ -38,7 +40,6 @@ void createList(Barber** headRef, int n) {
     for (int i = 1; i <= n; i++) {
         Barber* newNode = new Barber;
         newNode->numB = i;
-        newNode->onBreak = false;
         newNode->next = nullptr;
 
         if (*headRef == nullptr) {
@@ -58,7 +59,6 @@ void createList(Barber** headRef, int n) {
 void addElement(Barber** headRef, int numB) {
     Barber* newNode = new Barber;
     newNode->numB = numB;
-    newNode->onBreak = false;
     newNode->next = nullptr;
 
     if (*headRef == nullptr) {
@@ -72,6 +72,80 @@ void addElement(Barber** headRef, int numB) {
         current->next = newNode;
     }
 }
+
+// Function to push the first node to the back of a linked-list.
+void pushToBack(Barber** headRef) {
+    if (*headRef == nullptr) {
+        return;
+    }
+
+    Barber* first = *headRef;
+    *headRef = first->next;
+
+    Barber* current = *headRef;
+    while (current->next != nullptr) {
+        current = current->next;
+    }
+    current->next = first;
+    first->next = nullptr;
+}
+
+void checkBreakTime(Barber* head, int currentTime){
+    Barber* current = head;
+    int hundrethPlace = (currentTime / 100) % 10;
+    while (current != nullptr) {
+        if (current->numB == hundrethPlace) {
+            /* Barber is on break 
+                // - A new list
+                - A bool onBreak change
+            */
+            current->onBreak = true;
+        }
+        else {
+            current->onBreak = false;
+        }
+        current = current->next;
+    }
+}
+
+void sortList(Barber** headRef) {
+    Barber* current = *headRef;
+    Barber* min;
+
+    while (current != nullptr) {
+        min = current;
+        Barber* innerCurrent = current->next;
+        while (innerCurrent != nullptr) {
+            if (innerCurrent->numB < min->numB ||
+                (innerCurrent->numB == min->numB && innerCurrent->lastWorkTime < min->lastWorkTime) ||
+                (innerCurrent->numB == min->numB && innerCurrent->lastWorkTime == min->lastWorkTime && innerCurrent->onBreak == false && min->onBreak == true)) {
+                min = innerCurrent;
+            }
+            innerCurrent = innerCurrent->next;
+        }
+        if (min != current) {
+            swap(current->numB, min->numB);
+            swap(current->lastWorkTime, min->lastWorkTime);
+            swap(current->onBreak, min->onBreak);
+        }
+        current = current->next;
+    }
+}
+
+Barber* findNextAvailableBarber(Barber* head) {
+    sortList(&head);
+    Barber* current = head;
+    while (current != nullptr) {
+        if (current->onBreak == false) {
+            return current;
+        }
+        current = current->next;
+    }
+    return nullptr;
+}
+
+
+
 
 // Definition of a Client struct with three integer values and a pointer to the next Client.
 struct Client {
@@ -134,6 +208,33 @@ bool checkIfListIsEmpty(Client* head) {
     }
 }
 
+
+void deleteFirstElement(Client** headRef) {
+    if (*headRef == nullptr) {
+        checkIfListIsEmpty(*headRef);
+        return;
+    }
+
+    Client* temp = *headRef;
+    *headRef = (*headRef)->next;
+    delete temp;
+
+    checkIfListIsEmpty(*headRef);
+}
+/*
+void deleteFirstElement(Client** headRef) {
+    // Could use the checkIfListIsEmpty rather than do this again.
+    if (*headRef == nullptr) {
+        cout << "Linked list is already empty" << endl;
+        return;
+    }
+
+    Client* current = *headRef;
+    *headRef = current->next;
+    delete current;
+}
+*/
+
 // Definition of a OutputList struct with an integer value and a pointer to the next Node. Used to construct a linked list.
 struct OutputList {
     int spentTime;
@@ -182,28 +283,14 @@ void deleteList(OutputList** headRef) {
 }
 
 
-void checkBreakTime(Barber* head, int currentTime){
-    Barber* current = head;
-    int hundrethPlace = (currentTime / 100) % 10;
-    while (current != nullptr) {
-        if (current->numB == hundrethPlace) {
-            /* Barber is on break 
-                // - A new list
-                - A bool onBreak change
-            */
-            current->onBreak = true;
-            break;
-        }
-        current = current->next;
-    }
-}
+
 
 
 int main() {
     // CONSTANTS
     long int currentTime = 0;    
     long int maxTime = 2000000000;
-    cout << "Max time: " << currentTime << endl;
+    cout << "Max time: " << maxTime << endl;
 
     // Open the files
     ifstream input("hair.in");
@@ -234,6 +321,7 @@ int main() {
     Barber* head = nullptr;
     createList(&head, n);
     traverseList(head);
+
     cout << endl;
     
     // Create a linked list of clients
@@ -255,7 +343,12 @@ int main() {
     // Close the input file
     input.close();
 
+    // Initialize the OutputList linked list
     OutputList* head2 = nullptr;
+    long int outputTime;
+    int outputBarber;
+    int outputClient;
+    
     while (currentTime<=maxTime)
     {
         // Checks, if there are anymore clients, that need to be serviced
@@ -284,15 +377,52 @@ int main() {
                         - The output lists does this, by each line being an element in the linked list. DONE, this functionality is outside this loop.
             */
             // Start of the else
-            checkBreakTime(head, currentTime);
+            checkBreakTime(head, currentTime); //  ;currentTime = 1100;
             traverseList(head);
+            // cout << endl;
+
+            
+            /* Performa code magic
+            - both barber and client list pointers.
+                - If barber at the start isnt on break. If not, goto n+1
+                    - If check any other barber has the same lastWorkTime
+                        - If so, the barber with the smallest number wins.
+                    
+                OR
+                - Find barber with smallest number and smallest lastWorkTime that isnt on break.
+                    - when work time overlap -> sort and find smallest.
+                Pro: If this algo, then no need to change the positioning.
+                Con: Might cause problems with sorting and choosing next barber that goes to work.
+
+
+                Really, only need to calculate which barber is the one to go.
+            */ 
+            
+            // Sort the list
+
+            pushToBack(&head);
+            addElement(&head2, outputTime = 1, outputBarber = 1, outputClient = 1);
+            deleteFirstElement(&head1);
+            traverseList(head1);
+            traverseList(head);
+            pushToBack(&head);
+            addElement(&head2, outputTime = 2, outputBarber = 2, outputClient = 2);
+            deleteFirstElement(&head1);
+            traverseList(head1);
+            pushToBack(&head);
+            addElement(&head2, outputTime = 2, outputBarber = 2, outputClient = 2);
+            deleteFirstElement(&head1);
+            traverseList(head1);
+            traverseList(head1);
             break;
             /*
                 NOT DONE:
                     3. Klients ir jāapkalpo nekavējoties, ja eksistē brīvs frizieris un tam nav nekādu ierobežojumu veikt šo darbu.
                         - If a barber has finished servicing his client, he is immediately lower precedence than every other barber in the barbershop. This means, that, when he is freed up, he is pushed to the end of the list (not considering every other aspect of how barbers are chosen).
+                            - BUT he will need another variable to track the last time he has worked, at least as far as this algo is concerned.
                     
                     Customers are waiting in an honest and "tight" (meaning punctual) line. Only one client can come in at a certain time momemt. The receptionist (in the case of C++ and the context of this exercise, an algorithm) shall immediately determine the customers number (which corresponds to the customer order of arrival) thats between 1 and 200000 and the needed service time for the customers, that's between 1-900.
+                        - The ranges are already checked outside of this loop.
 
                     If there is an unserviced customer and several free barbers at the same time, then: preference is for a barber who has been without a customer for the longest amount of time (measured from the end of last serviced customer). Also, if two or more barbers have been waiting the same amount of time, then the barber who has the smaller number services the customer.
                         - The barbers might need another variable, that tracks the moment they finished servicing their last customer. This means, that we cant rely on the barber at the start of the list being the barber, that hasnt worked the longest.
@@ -304,6 +434,7 @@ int main() {
 
                     5. More accurate specification: customer C1 arrives at time T1 and needs service time S1 (service time means that it will take S1 amount of time, for the customer to be serviced). There's a free barber B1. Accordingly, the service takes place at the time interval of [T1...T1+(S1-1)]. The service is finished at the time: T1 + S1-1. If client C2 has already arrived before or at exactly at the time moment T1 + S1, then the barber B1 can start servicing client C2 at the time T1 + S1.
 
+                    7. Deal with counting the break time, 
             */
             /* algorithm code 
             Take barber, get client, when everything done, write result into output list, delete client, repeat. Break time is checked on each repeat.

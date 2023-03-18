@@ -6,6 +6,16 @@ A
 
 
 
+
+
+Barber list and time problem:
+- need to have another variable. DONE
+- make outputlist element DONE
+    - Each loop iteration simply makes a new element in outputlist. DONE
+- both barber and client list pointers.
+    - If barber at the start
+
+
 1. Laiks nedrīkst pārsniegt 2 000 000 000.
 
 2. Katram barberim ir jādodas atpūsties, kad laika momenta simtnieku pozīcijas cipars sartīt ar friziera numuru, tas ir frizierim ar numur 5 jāatpūšas laikos 500-599, 1500-1599, 2500-2599 utt.
@@ -17,6 +27,7 @@ A
 6. Klienti gaida stingrā (godīgā) rindā. Vienā laika momentā var ierasties tikai viens klients. Reģistrators uzreiz nosaka klientam ierašanās kārtas numuru [1..200 000] un pakalpojuma laiku [1..900].
 
 7. ...
+
 
 Description
 
