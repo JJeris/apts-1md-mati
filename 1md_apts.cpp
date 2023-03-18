@@ -1,35 +1,29 @@
-/**
-Nr 1-9
-Laiks 2 000 000 000
-Atpūšas, kad simtnieku pozīcijas cipas sakrīt ar nr: 5 un 500-590, 1500-1599 utt
-out - k beigu moments, f nr., k nr.
-secīgi laikam pieaugot. Ja vienā laika momentā beidz apkalpot vairākus klientus, tad rezultāti jādrukā frizieru numuru secībā.
-**/
-
 #include <iostream>
 #include <fstream>
 using namespace std;
 
-// Definition of a Node struct with an integer value and a pointer to the next Node. Used to construct a linked list.
-struct Node {
-    int value;
-    Node* next;
+// Definition of a Barber struct with an integer value and a pointer to the next Node. Used to construct a linked list.
+struct Barber {
+    int numB;
+    bool onBreak;
+    Barber* next;
 };
 
 // Traverse the linked list and print out each value
-void traverseList(Node* head) {
-    Node* current = head;
+void traverseList(Barber* head) {
+    Barber* current = head;
     while (current != nullptr) {
-        cout << current->value << " ";
+        cout << current->numB << " ";
+        cout << current->onBreak << " " << endl;
         current = current->next;
     }
 }
 
 // Delete the nodes in the linked list
-void deleteList(Node** headRef) {
-    Node* current = *headRef;
+void deleteList(Barber** headRef) {
+    Barber* current = *headRef;
     while (current != nullptr) {
-        Node* temp = current;
+        Barber* temp = current;
         current = current->next;
         delete temp;
     }
@@ -37,20 +31,21 @@ void deleteList(Node** headRef) {
 }
 
 // Creates a linked-list
-void createList(Node** headRef, int n) {
+void createList(Barber** headRef, int n) {
     *headRef = nullptr;
 
     // Create the linked list
     for (int i = 1; i <= n; i++) {
-        Node* newNode = new Node;
-        newNode->value = i;
+        Barber* newNode = new Barber;
+        newNode->numB = i;
+        newNode->onBreak = false;
         newNode->next = nullptr;
 
         if (*headRef == nullptr) {
             *headRef = newNode;
         }
         else {
-            Node* current = *headRef;
+            Barber* current = *headRef;
             while (current->next != nullptr) {
                 current = current->next;
             }
@@ -60,16 +55,17 @@ void createList(Node** headRef, int n) {
 }
 
 // Function to append a new node to the end of a linked-list.
-void addElement(Node** headRef, int value) {
-    Node* newNode = new Node;
-    newNode->value = value;
+void addElement(Barber** headRef, int numB) {
+    Barber* newNode = new Barber;
+    newNode->numB = numB;
+    newNode->onBreak = false;
     newNode->next = nullptr;
 
     if (*headRef == nullptr) {
         *headRef = newNode;
     }
     else {
-        Node* current = *headRef;
+        Barber* current = *headRef;
         while (current->next != nullptr) {
             current = current->next;
         }
@@ -77,40 +73,40 @@ void addElement(Node** headRef, int value) {
     }
 }
 
-// Definition of a Node struct with three integer values and a pointer to the next Node.
-struct Node1 {
+// Definition of a Client struct with three integer values and a pointer to the next Client.
+struct Client {
     int time;
-    int num;
+    int numC;
     int duration;
-    Node1* next;
+    Client* next;
 };
 
 // Traverse the linked list and print out each value
-void traverseList(Node1* head) {
-    Node1* current = head;
+void traverseList(Client* head) {
+    Client* current = head;
     while (current != nullptr) {
-        std::cout << "Time: " << current->time << ", ";
-        std::cout << "Num: " << current->num << ", ";
-        std::cout << "Duration: " << current->duration << std::endl;
+        cout << "Time: " << current->time << ", ";
+        cout << "NumC: " << current->numC << ", ";
+        cout << "Duration: " << current->duration << endl;
         current = current->next;
     }
 }
 
 // Delete the nodes in the linked list
-void deleteList(Node1** headRef) {
-    Node1* current = *headRef;
+void deleteList(Client** headRef) {
+    Client* current = *headRef;
     while (current != nullptr) {
-        Node1* temp = current;
+        Client* temp = current;
         current = current->next;
         delete temp;
     }
     *headRef = nullptr;
 }
 
-void appendToList(Node1** headRef, int time, int num, int duration) {
-    Node1* newNode = new Node1;
+void appendToList(Client** headRef, int time, int numC, int duration) {
+    Client* newNode = new Client;
     newNode->time = time;
-    newNode->num = num;
+    newNode->numC = numC;
     newNode->duration = duration;
     newNode->next = nullptr;
 
@@ -118,7 +114,7 @@ void appendToList(Node1** headRef, int time, int num, int duration) {
         *headRef = newNode;
     }
     else {
-        Node1* current = *headRef;
+        Client* current = *headRef;
         while (current->next != nullptr) {
             current = current->next;
         }
@@ -126,25 +122,38 @@ void appendToList(Node1** headRef, int time, int num, int duration) {
     }
 }
 
-struct Node2 {
+// checks whether the linked list is empty
+bool checkIfListIsEmpty(Client* head) {
+    if (head == nullptr) {
+        cout << "Linked list is empty" << endl;
+        return true;
+    }
+    else {
+        cout << "Linked list is not empty" << endl;
+        return false;
+    }
+}
+
+// Definition of a OutputList struct with an integer value and a pointer to the next Node. Used to construct a linked list.
+struct OutputList {
     int spentTime;
     int barberNum;
     int clientNum;
-    Node2* next;
+    OutputList* next;
 };
 
-void traverseList(Node2* head) {
-    Node2* current = head;
+void traverseList(OutputList* head) {
+    OutputList* current = head;
     while (current != nullptr) {
-        std::cout << "Spent Time: " << current->spentTime << ", ";
-        std::cout << "Barber Num: " << current->barberNum << ", ";
-        std::cout << "Client Num: " << current->clientNum << std::endl;
+        cout << "Spent Time: " << current->spentTime << ", ";
+        cout << "Barber Num: " << current->barberNum << ", ";
+        cout << "Client Num: " << current->clientNum << endl;
         current = current->next;
     }
 }
 
-void addElement(Node2** headRef, int spentTime, int barberNum, int clientNum) {
-    Node2* newNode = new Node2;
+void addElement(OutputList** headRef, int spentTime, int barberNum, int clientNum) {
+    OutputList* newNode = new OutputList;
     newNode->spentTime = spentTime;
     newNode->barberNum = barberNum;
     newNode->clientNum = clientNum;
@@ -154,7 +163,7 @@ void addElement(Node2** headRef, int spentTime, int barberNum, int clientNum) {
         *headRef = newNode;
     }
     else {
-        Node2* current = *headRef;
+        OutputList* current = *headRef;
         while (current->next != nullptr) {
             current = current->next;
         }
@@ -162,20 +171,39 @@ void addElement(Node2** headRef, int spentTime, int barberNum, int clientNum) {
     }
 }
 
-void deleteList(Node2** headRef) {
-    Node2* current = *headRef;
+void deleteList(OutputList** headRef) {
+    OutputList* current = *headRef;
     while (current != nullptr) {
-        Node2* temp = current;
+        OutputList* temp = current;
         current = current->next;
         delete temp;
     }
     *headRef = nullptr;
 }
 
+
+void checkBreakTime(Barber* head, int currentTime){
+    Barber* current = head;
+    int hundrethPlace = (currentTime / 100) % 10;
+    while (current != nullptr) {
+        if (current->numB == hundrethPlace) {
+            /* Barber is on break 
+                // - A new list
+                - A bool onBreak change
+            */
+            current->onBreak = true;
+            break;
+        }
+        current = current->next;
+    }
+}
+
+
 int main() {
-    // Global variables
-    long int MAX_TIME = 2000000000;
-    cout << "Max time: " << MAX_TIME << endl;
+    // CONSTANTS
+    long int currentTime = 0;    
+    long int maxTime = 2000000000;
+    cout << "Max time: " << currentTime << endl;
 
     // Open the files
     ifstream input("hair.in");
@@ -201,16 +229,15 @@ int main() {
     } 
     // Output the first line to the console
     cout << "The number of barbers: " << n << endl;
-    // output << n << endl;
 
     // Create a linked list of barbers
-    Node* head = nullptr;
+    Barber* head = nullptr;
     createList(&head, n);
     traverseList(head);
     cout << endl;
     
     // Create a linked list of clients
-    Node1* head1 = nullptr; 
+    Client* head1 = nullptr; 
     int time; 
     int num; 
     int duration;
@@ -224,27 +251,77 @@ int main() {
         }
     }
     traverseList(head1);
+
     // Close the input file
     input.close();
 
-
-
-    Node2* head2 = nullptr;
-    while (true)
+    OutputList* head2 = nullptr;
+    while (currentTime<=maxTime)
     {
-        /* code */
-        break;
-    }
-    addElement(&head2, 20, 1, 1);
-    addElement(&head2, 50, 1, 3);
-    addElement(&head2, 70, 2, 2);
+        // Checks, if there are anymore clients, that need to be serviced
+        if (checkIfListIsEmpty(head1) == true){
+            cout << "The client list is empty - there are no more clients to service." << endl;
+            break;
+        } 
+        else {
+            /*
+            List of conditions already met outside while loop:
+            All input values are checked, before they are entered into the their respective linked lists. 
+            */
+            /*
+            List of conditions in this while loop: 
+            */
+            /*
+                DONE:
+                    1. Time cant exceed 2 000 000 000. DONE, the while loop takes care of this.
+                    2. A barber is resting and not taking on clients, if the hundredths place position in of the time variable corresponds to the the barbers own number, i.e. the barber with the number 5 will rest when the time variable is [500-599], [1500-1599], [2500.. 2599], etc. 
+                        - Needs a function, that loops through barber list, and changes a bool value or puts the barber in another list, if any of them need to be resting. DONE, function checkBreakTime does this, changes a bool value.
 
-    // Traverse the list and write values to file
-    Node2* current = head2;
+
+                    
+
+                    6. Knowing the arrival time, the number (customers number) and service time (duration of the service) of the customer, output the end of service moments time, the barbers number (who sercived the customer) and the customers number (the number of the customer, who was serviced). Outputting should be done sequentially, as in, according to the times growing order. If several clients service ends at the exact same time moment, then the result of these services are outputted according to the growing order of the barbers (that serviced these customers) numbers.
+                        - The output lists does this, by each line being an element in the linked list. DONE, this functionality is outside this loop.
+            */
+            // Start of the else
+            checkBreakTime(head, currentTime);
+            traverseList(head);
+            break;
+            /*
+                NOT DONE:
+                    3. Klients ir jāapkalpo nekavējoties, ja eksistē brīvs frizieris un tam nav nekādu ierobežojumu veikt šo darbu.
+                        - If a barber has finished servicing his client, he is immediately lower precedence than every other barber in the barbershop. This means, that, when he is freed up, he is pushed to the end of the list (not considering every other aspect of how barbers are chosen).
+                    
+                    Customers are waiting in an honest and "tight" (meaning punctual) line. Only one client can come in at a certain time momemt. The receptionist (in the case of C++ and the context of this exercise, an algorithm) shall immediately determine the customers number (which corresponds to the customer order of arrival) thats between 1 and 200000 and the needed service time for the customers, that's between 1-900.
+
+                    If there is an unserviced customer and several free barbers at the same time, then: preference is for a barber who has been without a customer for the longest amount of time (measured from the end of last serviced customer). Also, if two or more barbers have been waiting the same amount of time, then the barber who has the smaller number services the customer.
+                        - The barbers might need another variable, that tracks the moment they finished servicing their last customer. This means, that we cant rely on the barber at the start of the list being the barber, that hasnt worked the longest.
+
+                    4. Frizierim, beidzot darbu pie kārtējā klienta, ar nākošo laika momentu jāmēģina apkalpot kādu klientu.
+                        - An if condition, that checks, if clients needed service time is less than the remaining time between the first barbers in the barbers list remaining time, till the next hundreth starts.
+                        If remaining time+service needed time doesn't overslap break time
+                            - incramentally dividing the service time, if its big enough, and checking it in a loop, if the task cannot be completed. This will be inside the currentTime>=100 condition. 
+
+                    5. More accurate specification: customer C1 arrives at time T1 and needs service time S1 (service time means that it will take S1 amount of time, for the customer to be serviced). There's a free barber B1. Accordingly, the service takes place at the time interval of [T1...T1+(S1-1)]. The service is finished at the time: T1 + S1-1. If client C2 has already arrived before or at exactly at the time moment T1 + S1, then the barber B1 can start servicing client C2 at the time T1 + S1.
+
+            */
+            /* algorithm code 
+            Take barber, get client, when everything done, write result into output list, delete client, repeat. Break time is checked on each repeat.
+                - Need to sort out barber sequence and the order, that they take their respective clients.
+            
+            */
+            return 1;
+        }
+
+    }
+
+    
+    // Traverse the list and write values to file. Dont know if this can be a function.
+    OutputList* current = head2;
     while (current != nullptr) {
         output << current->spentTime << " ";
         output << current->barberNum << " ";
-        output << current->clientNum << std::endl;
+        output << current->clientNum << endl;
         current = current->next;
     }
 
@@ -259,6 +336,90 @@ int main() {
 }
 
 
+// int main() {
+//     // CONSTANTS
+//     long int MAX_TIME = 2000000000;
+//     cout << "Max time: " << MAX_TIME << endl;
+
+//     // Open the files
+//     ifstream input("hair.in");
+//     ofstream output("hair.out");
+
+//     // Check if the file was opened successfully
+//     if (!input.is_open())
+//     {
+//         cout << "Failed to open input file." << endl;
+//         return 1;
+//     }
+//     if (!output.is_open())
+//     {
+//         cout << "Failed to open output file." << endl;
+//         return 1;
+//     }
+
+//     int n;
+//     input >> n;
+//     if (n < 1 || n>9){
+//         cout << "Number of barbers has be between 1-9." << endl;
+//         return 1;  
+//     } 
+//     // Output the first line to the console
+//     cout << "The number of barbers: " << n << endl;
+
+//     // Create a linked list of barbers
+//     Barber* head = nullptr;
+//     createList(&head, n);
+//     traverseList(head);
+//     cout << endl;
+    
+//     // Create a linked list of clients
+//     Client* head1 = nullptr; 
+//     int time; 
+//     int num; 
+//     int duration;
+//     while (input >> time >> num >> duration) {
+//         if (time == 0) break;
+//         if (num >= 1 && num <= 200000 && duration >= 1 && duration <= 900) {
+//             appendToList(&head1, time, num, duration);
+//         } else {
+//             cout << "Error: Invalid input value for num or duration." << endl;
+//             return 1;
+//         }
+//     }
+//     traverseList(head1);
+
+//     // Close the input file
+//     input.close();
+
+//     OutputList* head2 = nullptr;
+//     while (true)
+//     {
+//         /* code */
+//         break;
+//     }
+
+//     // Traverse the list and write values to file
+//     OutputList* current = head2;
+//     while (current != nullptr) {
+//         output << current->spentTime << " ";
+//         output << current->barberNum << " ";
+//         output << current->clientNum << endl;
+//         current = current->next;
+//     }
+
+//     // Close the output file
+//     output.close();
+
+//     // Free memory
+//     deleteList(&head);
+//     deleteList(&head1);
+//     deleteList(&head2);
+//     return 0;
+// }
+
+    // addElement(&head2, 20, 1, 1);
+    // addElement(&head2, 50, 1, 3);
+    // addElement(&head2, 70, 2, 2);
 
 
 

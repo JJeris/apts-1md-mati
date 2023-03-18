@@ -17,7 +17,17 @@ Plan:
 
 Need a function that removes a single element from a linked list
 Need to write down every condition and edge case that can happen, then ask gpt to make a solution for each one.
-                                                                                                                                                                                
+
+
+/**
+Nr 1-9
+Laiks 2 000 000 000
+Atpūšas, kad simtnieku pozīcijas cipas sakrīt ar nr: 5 un 500-590, 1500-1599 utt
+out - k beigu moments, f nr., k nr.
+secīgi laikam pieaugot. Ja vienā laika momentā beidz apkalpot vairākus klientus, tad rezultāti jādrukā frizieru numuru secībā.
+**/
+
+
 I have this code:
 #include <iostream>
 #include <fstream>
