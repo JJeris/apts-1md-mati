@@ -195,8 +195,8 @@ int main() {
 
     int n;
     input >> n;
-    if (n == 0){
-        cout << "Number of barbers can't be zero." << endl;
+    if (n < 1 || n>9){
+        cout << "Number of barbers has be between 1-9." << endl;
         return 1;  
     } 
     // Output the first line to the console
@@ -216,13 +216,25 @@ int main() {
     int duration;
     while (input >> time >> num >> duration) {
         if (time == 0) break;
-        appendToList(&head1, time, num, duration);
+        if (num >= 1 && num <= 200000 && duration >= 1 && duration <= 900) {
+            appendToList(&head1, time, num, duration);
+        } else {
+            cout << "Error: Invalid input value for num or duration." << endl;
+            return 1;
+        }
     }
     traverseList(head1);
-    
+    // Close the input file
+    input.close();
+
+
 
     Node2* head2 = nullptr;
-
+    while (true)
+    {
+        /* code */
+        break;
+    }
     addElement(&head2, 20, 1, 1);
     addElement(&head2, 50, 1, 3);
     addElement(&head2, 70, 2, 2);
@@ -236,8 +248,7 @@ int main() {
         current = current->next;
     }
 
-    // Close the file
-    input.close();
+    // Close the output file
     output.close();
 
     // Free memory
