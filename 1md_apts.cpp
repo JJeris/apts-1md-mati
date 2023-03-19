@@ -386,11 +386,11 @@ int main() {
     int num; 
     int duration;
     while (input >> time >> num >> duration) {
-        if (time == 0) break;
+        if (time == 0) break; //! Mby have to change this a lil bit.
         if (num >= 1 && num <= 200000 && duration >= 1 && duration <= 900) {
             appendToList(&head1, time, num, duration);
         } else {
-            cout << "Error: Invalid input value for num or duration." << endl;
+            cout << "Invalid input value for num or duration." << endl;
             return 1;
         }
     }
@@ -417,32 +417,24 @@ int main() {
             All input values are checked, before they are entered into the their respective linked lists. 
             List of conditions in this while loop:  
                 DONE:
-                    1. Time cant exceed 2 000 000 000. DONE, the while loop takes care of this.
-                    2. A barber is resting and not taking on clients, if the hundredths place position in of the time variable corresponds to the the barbers own number, i.e. the barber with the number 5 will rest when the time variable is [500-599], [1500-1599], [2500.. 2599], etc. 
-                        - Needs a function, that loops through barber list, and changes a bool value or puts the barber in another list, if any of them need to be resting. DONE, function checkBreakTime does this, changes a bool value.
-
-
+                    1. Time cant exceed 2 000 000 000. 
+                        - DONE, the while loop takes care of this.
                     
+                    2. A barber is resting and not taking on clients, if the hundredths place position in of the time variable corresponds to the the barbers own number, i.e. the barber with the number 5 will rest when the time variable is [500-599], [1500-1599], [2500.. 2599], etc. 
+                        - Needs a function, that loops through barber list, and changes a bool value or puts the barber in another list, if any of them need to be resting. 
+                        - DONE, function checkBreakTime does this, changes a bool value.
 
                     6. Knowing the arrival time, the number (customers number) and service time (duration of the service) of the customer, output the end of service moments time, the barbers number (who sercived the customer) and the customers number (the number of the customer, who was serviced). Outputting should be done sequentially, as in, according to the times growing order. If several clients service ends at the exact same time moment, then the result of these services are outputted according to the growing order of the barbers (that serviced these customers) numbers.
                         - The output lists does this, by each line being an element in the linked list. This functionality is outside this loop.
                         - !NOTE DONE, the sortList only looks at the time and doesnt consider the barbers numB.
-                        - 
+                        - SORT OF DONE, still have to figure out how to keep track of the global time, so that this doen't mess up.
+                        - Or, have to make sure that one barber cant finish two clients at the same time.
             */
-            cout << "-----------------------------------------------------" << endl;    
-            checkBreakTime(head, currentTime);
-            /* Performa code magic
-            - both barber and client list pointers.
-                - If barber at the start isnt on break. If not, goto n+1
-                    - If check any other barber has the same lastWorkTime
-                        - If so, the barber with the smallest number wins.
-                    
-                OR
+            /* ALGO IDEA
                 - Find barber with smallest number and smallest lastWorkTime that isnt on break.
                     - when work time overlap -> sort and find smallest.
                 Pro: If this algo, then no need to change the positioning.
                 Con: Might cause problems with sorting and choosing next barber that goes to work.
-
 
                 Really, only need to calculate which barber is the one to go.
             */ 
@@ -460,24 +452,26 @@ int main() {
                         - DOENST WORK ATM
             
             */
+            cout << "-----------------------------------------------------" << endl;    
+            checkBreakTime(head, currentTime);
+
             Barber* nextAvailableBarber = findNextAvailableBarber(head);
             cout << "The next available barber numB: " << nextAvailableBarber->numB << endl;
             cout << "Current client " << endl << "Time: " << head1->time <<  endl << "numC: " << head1->numC << endl << "Duration: " << head1->duration << endl;
 
-            sortList(&head);
-            Barber* current = head;
-            while(current != nullptr) {
-                /*
-                1. Paņem barberi
-                2. Paņem klientu
-                3. Sačeko, vai laiki overlapos ar onBreak condition.
-                */
+            //! Doesnt work atm, maent to fix the break time checking.
+            // sortList(&head);
+            // Barber* current = head;
+            // while(current != nullptr) {
+            //     /*
+            //     1. Paņem barberi
+            //     2. Paņem klientu
+            //     3. Sačeko, vai laiki overlapos ar onBreak condition.
+            //     */
+            // }
 
-                
-            }
 
-
-            currentTime+=head1->time;
+            currentTime += head1->time;
             cout << endl << "Current time: " << currentTime << endl;
 
             //! This doesnt work for hair.i1-i4, but sort of works for i5, if currentTime+=outputTime at the end of the loop.
