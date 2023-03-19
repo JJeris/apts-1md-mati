@@ -108,74 +108,6 @@ void checkBreakTime(Barber* head, int currentTime){
     }
 }
 
-/**
- * Sorts a linked list of Barber elements in non-descending order based on their `numB`, `lastWorkTime`, and `onBreak` properties.
- * 
- * @param headRef a pointer to a pointer to the head of the linked list of Barber elements to be sorted
- * 
- * The function works by iterating through the linked list and finding the minimum element from the current element to the end of the list.
- * If the minimum element is not the current element, the function swaps the values of the current element with the minimum element, effectively 
- * moving the minimum element to its correct position in the sorted list. This process continues until the entire list is sorted.
- * 
- * If there are multiple elements with the same `numB` and `lastWorkTime`, the function prioritizes the element whose `onBreak` property is false 
- * over the one whose `onBreak` property is true, as it is assumed that a barber who is not on break is available to serve customers immediately.
- * 
- * Note that the function only modifies the values of the `numB`, `lastWorkTime`, and `onBreak` properties of the Barber elements, and does not
- * add, remove, or modify any nodes in the linked list.
- */
-/*
-void sortList(Barber** headRef) {
-    Barber* current = *headRef;
-    Barber* min;
-
-    while (current != nullptr) {
-        // Find the minimum element from current to the end of the list
-        min = current;
-        Barber* innerCurrent = current->next;
-        while (innerCurrent != nullptr) {
-            if (innerCurrent->numB < min->numB ||
-                (innerCurrent->numB == min->numB && innerCurrent->lastWorkTime < min->lastWorkTime) ||
-                (innerCurrent->numB == min->numB && innerCurrent->lastWorkTime == min->lastWorkTime && innerCurrent->onBreak == false && min->onBreak == true)) {
-                min = innerCurrent;
-            }
-            innerCurrent = innerCurrent->next;
-        }
-        // Swap the minimum element with the current element
-        if (min != current) {
-            swap(current->numB, min->numB);
-            swap(current->lastWorkTime, min->lastWorkTime);
-            swap(current->onBreak, min->onBreak);
-        }
-        current = current->next;
-    }
-}
-
-void sortList(Barber** headRef) {
-    Barber* current = *headRef;
-    Barber* min;
-
-    while (current != nullptr) {
-        // Find the minimum element from current to the end of the list
-        min = current;
-        Barber* innerCurrent = current->next;
-        while (innerCurrent != nullptr) {
-            if (innerCurrent->numB < min->numB ||
-                (innerCurrent->numB == min->numB && innerCurrent->lastWorkTime < min->lastWorkTime)) {
-                min = innerCurrent;
-            }
-            innerCurrent = innerCurrent->next;
-        }
-        // Swap the minimum element with the current element
-        if (min != current) {
-            swap(current->numB, min->numB);
-            swap(current->lastWorkTime, min->lastWorkTime);
-            swap(current->onBreak, min->onBreak);
-        }
-        current = current->next;
-    }
-}
-*/
-
 // This function sorts a linked list of Barber nodes in ascending order based on their lastWorkTime and numB attributes. It uses a selection sort algorithm to find the minimum element from the current node to the end of the list, and swaps it with the current node if necessary. The function takes a pointer to the head of the linked list as input and modifies the list in place.
 void sortList(Barber** headRef) {
     Barber* current = *headRef;
@@ -277,37 +209,14 @@ bool checkIfListIsEmpty(Client* head) {
     }
 }
 
-//! DOESNT MAKE SENSE, needs to be reworked.
 void deleteFirstElement(Client** headRef) {
-    
-
     if (checkIfListIsEmpty(*headRef) == true) {
         return;
     }
-    // if (*headRef == nullptr) {
-    //     checkIfListIsEmpty(*headRef);
-    //     return;
-    // }
-
     Client* temp = *headRef;
     *headRef = (*headRef)->next;
     delete temp;
-
-    // checkIfListIsEmpty(*headRef);
 }
-/*
-void deleteFirstElement(Client** headRef) {
-    // Could use the checkIfListIsEmpty rather than do this again.
-    if (*headRef == nullptr) {
-        cout << "Linked list is already empty" << endl;
-        return;
-    }
-
-    Client* current = *headRef;
-    *headRef = current->next;
-    delete current;
-}
-*/
 
 // Definition of a OutputList struct with an integer value and a pointer to the next Node. Used to construct a linked list.
 //! We need this, so we can sort the client list by the their end of service time. IDK how else this would be done.
@@ -357,7 +266,8 @@ void deleteList(OutputList** headRef) {
     *headRef = nullptr;
 }
 
-// This function takes a reference to the head of an OutputList and sorts the list in ascending order based on the spentTime variable. It uses a modified selection sort algorithm where the minimum element is repeatedly found and swapped with the current element.
+// This function takes a reference to the head of an OutputList and sorts the list in ascending order based on the spentTime variable and barberNum. It uses a modified selection sort algorithm where the minimum element is repeatedly found and swapped with the current element.
+/*
 void sortList(OutputList** headRef) {
     if (*headRef == nullptr || (*headRef)->next == nullptr) {
         // List is already sorted (or empty)
@@ -390,14 +300,61 @@ void sortList(OutputList** headRef) {
     // Update the head of the original list to point to the sorted list
     *headRef = sortedList;
 }
+*/
+// Sort of works
+//! Still have to figure out how to track time properly and reflect that in the code
+/*
+For example, this doesn't work properly.
+2
+10 1 10
+11 1 9
+12 1 8
+0
+*/
+void sortList(OutputList** headRef) {
+    if (*headRef == nullptr || (*headRef)->next == nullptr) {
+        // List is already sorted (or empty)
+        return;
+    }
+
+    OutputList* sortedList = nullptr;
+    OutputList* current = *headRef;
+
+    while (current != nullptr) {
+        OutputList* next = current->next;
+
+        if (sortedList == nullptr || current->spentTime < sortedList->spentTime ||
+            (current->spentTime == sortedList->spentTime && current->barberNum < sortedList->barberNum)) {
+            // Insert at the beginning of the sorted list
+            current->next = sortedList;
+            sortedList = current;
+        }
+        else {
+            // Traverse the sorted list to find the correct position to insert
+            OutputList* temp = sortedList;
+            while (temp->next != nullptr && (current->spentTime > temp->next->spentTime ||
+                                              (current->spentTime == temp->next->spentTime && current->barberNum > temp->next->barberNum))) {
+                temp = temp->next;
+            }
+            // Insert the current node at the correct position in the sorted list
+            current->next = temp->next;
+            temp->next = current;
+        }
+        current = next;
+    }
+    // Update the head of the original list to point to the sorted list
+    *headRef = sortedList;
+}
+
+
 
 int main() {
-    // CONSTANTS
+    // Gloabl variabes
     long int currentTime = 0;    
     long int maxTime = 2000000000;
 
     // Open the files
-    ifstream input("hair.i5");
+    ifstream input("hair.in");
     ofstream output("hair.out");
 
     // Check if the file was opened successfully
@@ -455,14 +412,11 @@ int main() {
             break;
         } 
         else {
-            /*
+            /* Conditions
             List of conditions already met outside while loop:
             All input values are checked, before they are entered into the their respective linked lists. 
-            */
-            /*
-            List of conditions in this while loop: 
-            */
-            /* DONE:
+            List of conditions in this while loop:  
+                DONE:
                     1. Time cant exceed 2 000 000 000. DONE, the while loop takes care of this.
                     2. A barber is resting and not taking on clients, if the hundredths place position in of the time variable corresponds to the the barbers own number, i.e. the barber with the number 5 will rest when the time variable is [500-599], [1500-1599], [2500.. 2599], etc. 
                         - Needs a function, that loops through barber list, and changes a bool value or puts the barber in another list, if any of them need to be resting. DONE, function checkBreakTime does this, changes a bool value.
@@ -471,7 +425,9 @@ int main() {
                     
 
                     6. Knowing the arrival time, the number (customers number) and service time (duration of the service) of the customer, output the end of service moments time, the barbers number (who sercived the customer) and the customers number (the number of the customer, who was serviced). Outputting should be done sequentially, as in, according to the times growing order. If several clients service ends at the exact same time moment, then the result of these services are outputted according to the growing order of the barbers (that serviced these customers) numbers.
-                        - The output lists does this, by each line being an element in the linked list. DONE, this functionality is outside this loop.
+                        - The output lists does this, by each line being an element in the linked list. This functionality is outside this loop.
+                        - !NOTE DONE, the sortList only looks at the time and doesnt consider the barbers numB.
+                        - 
             */
             cout << "-----------------------------------------------------" << endl;    
             checkBreakTime(head, currentTime);
@@ -500,12 +456,27 @@ int main() {
                 - Doesnt count break time and checks, if the barber can finish the job before his break starts.
                     - Really dunno how to do this one.
                 - Has to take into account the current time when making the end of service time - see hair.i5 and hair.o5 for an example of this issue.
-                    - an if that compares current time (which equals to the previous clients service time) and the arrival time of the current client. The bigger one takes center stage.
+                    - An if condition that compares current time (which equals to the previous clients service time) and the arrival time of the current client. The bigger one takes center stage.
+                        - DOENST WORK ATM
             
             */
             Barber* nextAvailableBarber = findNextAvailableBarber(head);
             cout << "The next available barber numB: " << nextAvailableBarber->numB << endl;
             cout << "Current client " << endl << "Time: " << head1->time <<  endl << "numC: " << head1->numC << endl << "Duration: " << head1->duration << endl;
+
+            sortList(&head);
+            Barber* current = head;
+            while(current != nullptr) {
+                /*
+                1. Paņem barberi
+                2. Paņem klientu
+                3. Sačeko, vai laiki overlapos ar onBreak condition.
+                */
+
+                
+            }
+
+
             currentTime+=head1->time;
             cout << endl << "Current time: " << currentTime << endl;
 
@@ -566,149 +537,3 @@ int main() {
     deleteList(&head2);
     return 0;
 }
-
-            /*
-            // pushToBack(&head);
-            // addElement(&head2, outputTime = 1, outputBarber = 1, outputClient = 1);
-            // deleteFirstElement(&head1);
-            // traverseList(head1);
-            // traverseList(head);
-            // pushToBack(&head);
-            // addElement(&head2, outputTime = 2, outputBarber = 2, outputClient = 2);
-            // deleteFirstElement(&head1);
-            // traverseList(head1);
-            // pushToBack(&head);
-            // addElement(&head2, outputTime = 2, outputBarber = 2, outputClient = 2);
-            // deleteFirstElement(&head1);
-            // traverseList(head1);
-            // traverseList(head1);
-            */
-// int main() {
-//     // CONSTANTS
-//     long int MAX_TIME = 2000000000;
-//     cout << "Max time: " << MAX_TIME << endl;
-
-//     // Open the files
-//     ifstream input("hair.in");
-//     ofstream output("hair.out");
-
-//     // Check if the file was opened successfully
-//     if (!input.is_open())
-//     {
-//         cout << "Failed to open input file." << endl;
-//         return 1;
-//     }
-//     if (!output.is_open())
-//     {
-//         cout << "Failed to open output file." << endl;
-//         return 1;
-//     }
-
-//     int n;
-//     input >> n;
-//     if (n < 1 || n>9){
-//         cout << "Number of barbers has be between 1-9." << endl;
-//         return 1;  
-//     } 
-//     // Output the first line to the console
-//     cout << "The number of barbers: " << n << endl;
-
-//     // Create a linked list of barbers
-//     Barber* head = nullptr;
-//     createList(&head, n);
-//     traverseList(head);
-//     cout << endl;
-    
-//     // Create a linked list of clients
-//     Client* head1 = nullptr; 
-//     int time; 
-//     int num; 
-//     int duration;
-//     while (input >> time >> num >> duration) {
-//         if (time == 0) break;
-//         if (num >= 1 && num <= 200000 && duration >= 1 && duration <= 900) {
-//             appendToList(&head1, time, num, duration);
-//         } else {
-//             cout << "Error: Invalid input value for num or duration." << endl;
-//             return 1;
-//         }
-//     }
-//     traverseList(head1);
-
-//     // Close the input file
-//     input.close();
-
-//     OutputList* head2 = nullptr;
-//     while (true)
-//     {
-//         /* code */
-//         break;
-//     }
-
-//     // Traverse the list and write values to file
-//     OutputList* current = head2;
-//     while (current != nullptr) {
-//         output << current->spentTime << " ";
-//         output << current->barberNum << " ";
-//         output << current->clientNum << endl;
-//         current = current->next;
-//     }
-
-//     // Close the output file
-//     output.close();
-
-//     // Free memory
-//     deleteList(&head);
-//     deleteList(&head1);
-//     deleteList(&head2);
-//     return 0;
-// }
-
-    // addElement(&head2, 20, 1, 1);
-    // addElement(&head2, 50, 1, 3);
-    // addElement(&head2, 70, 2, 2);
-
-
-
-
-    // int num;
-    // while (input >> num)
-    // {
-    //     cout << "Number: " << num << endl;
-    //     output << num << endl;
-    // }
-    // input.close();
-
-// // DEMO
-// void seperateLists(){
-//     // Create the first linked-list
-//     Node* head1 = nullptr;
-//     createList(&head1, 5);
-
-//     // Create the second linked-list
-//     Node* head2 = nullptr;
-//     addElement(&head2, 10);
-//     addElement(&head2, 20);
-//     addElement(&head2, 30);
-
-//     // Add an element from list1 to list2
-//     Node* current = head1;
-//     while (current != nullptr && current->value != 3) {
-//         current = current->next;
-//     }
-
-//     if (current != nullptr) {
-//         addElement(&head2, current->value);
-//     }
-// }
-
-// // DEMO
-// void demoClientList(){
-//     Node1* head = nullptr;
-//     appendToList(&head, 10, 1, 100);
-//     appendToList(&head, 20, 2, 200);
-//     appendToList(&head, 30, 3, 300);
-//     traverseList(head);
-//     deleteList(&head);
-
-// }
