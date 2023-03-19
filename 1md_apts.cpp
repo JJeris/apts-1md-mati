@@ -108,11 +108,28 @@ void checkBreakTime(Barber* head, int currentTime){
     }
 }
 
+/**
+ * Sorts a linked list of Barber elements in non-descending order based on their `numB`, `lastWorkTime`, and `onBreak` properties.
+ * 
+ * @param headRef a pointer to a pointer to the head of the linked list of Barber elements to be sorted
+ * 
+ * The function works by iterating through the linked list and finding the minimum element from the current element to the end of the list.
+ * If the minimum element is not the current element, the function swaps the values of the current element with the minimum element, effectively 
+ * moving the minimum element to its correct position in the sorted list. This process continues until the entire list is sorted.
+ * 
+ * If there are multiple elements with the same `numB` and `lastWorkTime`, the function prioritizes the element whose `onBreak` property is false 
+ * over the one whose `onBreak` property is true, as it is assumed that a barber who is not on break is available to serve customers immediately.
+ * 
+ * Note that the function only modifies the values of the `numB`, `lastWorkTime`, and `onBreak` properties of the Barber elements, and does not
+ * add, remove, or modify any nodes in the linked list.
+ */
+/*
 void sortList(Barber** headRef) {
     Barber* current = *headRef;
     Barber* min;
 
     while (current != nullptr) {
+        // Find the minimum element from current to the end of the list
         min = current;
         Barber* innerCurrent = current->next;
         while (innerCurrent != nullptr) {
@@ -123,6 +140,7 @@ void sortList(Barber** headRef) {
             }
             innerCurrent = innerCurrent->next;
         }
+        // Swap the minimum element with the current element
         if (min != current) {
             swap(current->numB, min->numB);
             swap(current->lastWorkTime, min->lastWorkTime);
@@ -132,6 +150,59 @@ void sortList(Barber** headRef) {
     }
 }
 
+void sortList(Barber** headRef) {
+    Barber* current = *headRef;
+    Barber* min;
+
+    while (current != nullptr) {
+        // Find the minimum element from current to the end of the list
+        min = current;
+        Barber* innerCurrent = current->next;
+        while (innerCurrent != nullptr) {
+            if (innerCurrent->numB < min->numB ||
+                (innerCurrent->numB == min->numB && innerCurrent->lastWorkTime < min->lastWorkTime)) {
+                min = innerCurrent;
+            }
+            innerCurrent = innerCurrent->next;
+        }
+        // Swap the minimum element with the current element
+        if (min != current) {
+            swap(current->numB, min->numB);
+            swap(current->lastWorkTime, min->lastWorkTime);
+            swap(current->onBreak, min->onBreak);
+        }
+        current = current->next;
+    }
+}
+*/
+
+void sortList(Barber** headRef) {
+    Barber* current = *headRef;
+    Barber* min;
+
+    while (current != nullptr) {
+        // Find the minimum element from current to the end of the list
+        min = current;
+        Barber* innerCurrent = current->next;
+        while (innerCurrent != nullptr) {
+            if (innerCurrent->lastWorkTime < min->lastWorkTime ||
+                (innerCurrent->lastWorkTime == min->lastWorkTime && innerCurrent->numB < min->numB)) {
+                min = innerCurrent;
+            }
+            innerCurrent = innerCurrent->next;
+        }
+        // Swap the minimum element with the current element
+        if (min != current) {
+            swap(current->numB, min->numB);
+            swap(current->lastWorkTime, min->lastWorkTime);
+            swap(current->onBreak, min->onBreak);
+        }
+        current = current->next;
+    }
+}
+
+
+// This function finds the smallest element in a linked list that is not currently on break.
 Barber* findNextAvailableBarber(Barber* head) {
     sortList(&head);
     Barber* current = head;
@@ -208,12 +279,17 @@ bool checkIfListIsEmpty(Client* head) {
     }
 }
 
-
+//! DOESNT MAKE SENSE, needs to be reworked.
 void deleteFirstElement(Client** headRef) {
-    if (*headRef == nullptr) {
-        checkIfListIsEmpty(*headRef);
+    
+
+    if (checkIfListIsEmpty(*headRef) == true) {
         return;
     }
+    // if (*headRef == nullptr) {
+    //     checkIfListIsEmpty(*headRef);
+    //     return;
+    // }
 
     Client* temp = *headRef;
     *headRef = (*headRef)->next;
@@ -236,6 +312,7 @@ void deleteFirstElement(Client** headRef) {
 */
 
 // Definition of a OutputList struct with an integer value and a pointer to the next Node. Used to construct a linked list.
+//! We need this, so we can sort the client list by the their end of service time. IDK how else this would be done.
 struct OutputList {
     int spentTime;
     int barberNum;
@@ -321,7 +398,6 @@ int main() {
     Barber* head = nullptr;
     createList(&head, n);
     traverseList(head);
-
     cout << endl;
     
     // Create a linked list of clients
@@ -379,9 +455,7 @@ int main() {
             // Start of the else
             checkBreakTime(head, currentTime); //  ;currentTime = 1100;
             traverseList(head);
-            // cout << endl;
-
-            
+            cout << endl;
             /* Performa code magic
             - both barber and client list pointers.
                 - If barber at the start isnt on break. If not, goto n+1
@@ -397,24 +471,43 @@ int main() {
 
                 Really, only need to calculate which barber is the one to go.
             */ 
+                       /* algorithm code 
+            Take barber, get client, when everything done, write result into output list, delete client, repeat. Break time is checked on each repeat.
+                - Need to sort out barber sequence and the order, that they take their respective clients.
             
-            // Sort the list
-
-            pushToBack(&head);
-            addElement(&head2, outputTime = 1, outputBarber = 1, outputClient = 1);
-            deleteFirstElement(&head1);
-            traverseList(head1);
+            */
+            //!USE THE FUNCTION ABOVE, NEXT AVAILABLE. Youre almost done. Sort the list
+            Barber* nextAvailableBarber = findNextAvailableBarber(head);
+            cout << nextAvailableBarber->numB << endl;
+            cout << head1->time << " " << head1->numC << " " << head1->duration << endl;
+            outputTime = head1->time + head1->duration - 1;
+            outputBarber = nextAvailableBarber->numB;
+            outputClient = head1->numC;
+            head->lastWorkTime = outputTime;
+            addElement(&head2, outputTime, outputBarber, outputClient); 
             traverseList(head);
-            pushToBack(&head);
-            addElement(&head2, outputTime = 2, outputBarber = 2, outputClient = 2);
+            cout << endl;
+            traverseList(head1);
+            cout << endl;
+            currentTime+=head1->time;
             deleteFirstElement(&head1);
-            traverseList(head1);
-            pushToBack(&head);
-            addElement(&head2, outputTime = 2, outputBarber = 2, outputClient = 2);
-            deleteFirstElement(&head1);
-            traverseList(head1);
-            traverseList(head1);
-            break;
+            cout << "Cuttent time: " << currentTime << endl;
+            
+            
+            // pushToBack(&head);
+            // addElement(&head2, outputTime = 1, outputBarber = 1, outputClient = 1);
+            // deleteFirstElement(&head1);
+            // traverseList(head1);
+            // traverseList(head);
+            // pushToBack(&head);
+            // addElement(&head2, outputTime = 2, outputBarber = 2, outputClient = 2);
+            // deleteFirstElement(&head1);
+            // traverseList(head1);
+            // pushToBack(&head);
+            // addElement(&head2, outputTime = 2, outputBarber = 2, outputClient = 2);
+            // deleteFirstElement(&head1);
+            // traverseList(head1);
+            // traverseList(head1);
             /*
                 NOT DONE:
                     3. Klients ir jāapkalpo nekavējoties, ja eksistē brīvs frizieris un tam nav nekādu ierobežojumu veikt šo darbu.
@@ -436,12 +529,6 @@ int main() {
 
                     7. Deal with counting the break time, 
             */
-            /* algorithm code 
-            Take barber, get client, when everything done, write result into output list, delete client, repeat. Break time is checked on each repeat.
-                - Need to sort out barber sequence and the order, that they take their respective clients.
-            
-            */
-            return 1;
         }
 
     }
