@@ -1,4 +1,3 @@
-#include <iostream>
 #include <fstream>
 using namespace std;
 
@@ -10,17 +9,6 @@ struct Barber {
     bool busy = false;
     Barber* next;
 };
-
-// Traverse the linked list and print out each value
-void traverseList(Barber* head) {
-    Barber* current = head;
-    while (current != nullptr) {
-        cout << current->numB << " ";
-        cout << current->lastWorkTime << " ";
-        cout << current->busy << " " << endl;
-        current = current->next;
-    }
-}
 
 // Delete the nodes in the linked list
 void deleteList(Barber** headRef) {
@@ -56,41 +44,6 @@ void createList(Barber** headRef, int n) {
     }
 }
 
-// Function to append a new node to the end of a linked-list.
-void addElement(Barber** headRef, int numB) {
-    Barber* newNode = new Barber;
-    newNode->numB = numB;
-    newNode->next = nullptr;
-
-    if (*headRef == nullptr) {
-        *headRef = newNode;
-    }
-    else {
-        Barber* current = *headRef;
-        while (current->next != nullptr) {
-            current = current->next;
-        }
-        current->next = newNode;
-    }
-}
-
-// Function to push the first node to the back of a linked-list.
-void pushFirstToBack(Barber** headRef) {
-    if (*headRef == nullptr) {
-        return;
-    }
-
-    Barber* first = *headRef;
-    *headRef = first->next;
-
-    Barber* current = *headRef;
-    while (current->next != nullptr) {
-        current = current->next;
-    }
-    current->next = first;
-    first->next = nullptr;
-}
-
 // This function sorts a linked list of Barber nodes in ascending order based on their lastWorkTime and numB attributes. It uses a selection sort algorithm to find the minimum element from the current node to the end of the list, and swaps it with the current node if necessary. The function takes a pointer to the head of the linked list as input and modifies the list in place.
 void sortList(Barber** headRef) {
     Barber* current = *headRef;
@@ -101,14 +54,7 @@ void sortList(Barber** headRef) {
         min = current;
         Barber* innerCurrent = current->next;
         while (innerCurrent != nullptr) {
-            
-            
 
-            // if (innerCurrent->busy && !min->busy ||
-            //     (innerCurrent->busy == min->busy && innerCurrent->lastWorkTime < min->lastWorkTime) ||
-            //     (innerCurrent->busy == min->busy && innerCurrent->lastWorkTime == min->lastWorkTime && innerCurrent->numB < min->numB)) {
-            //         min = innerCurrent;
-            // }
             if (!innerCurrent->busy && min->busy ||
                 (innerCurrent->busy == min->busy && innerCurrent->lastWorkTime < min->lastWorkTime) ||
                 (innerCurrent->busy == min->busy && innerCurrent->lastWorkTime == min->lastWorkTime && innerCurrent->numB < min->numB)) {
@@ -128,224 +74,7 @@ void sortList(Barber** headRef) {
         current = current->next;
     }
 }
-
-// This function finds the smallest element in a linked list that is not currently on break.
-// Barber* findNextAvailableBarber(Barber* head) {
-//     sortList(&head);
-//     Barber* current = head;
-//     while (current != nullptr) {
-//         if (current->onBreak == false) {
-//             return current;
-//         }
-//         current = current->next;
-//     }
-//     return nullptr;
-// }
-
-
-// Definition of a Client struct with three integer values and a pointer to the next Client.
-struct Client {
-    int time;
-    int numC;
-    int duration;
-    Client* next;
-};
-
-// Traverse the linked list and print out each value
-void traverseList(Client* head) {
-    Client* current = head;
-    while (current != nullptr) {
-        cout << "Time: " << current->time << ", ";
-        cout << "NumC: " << current->numC << ", ";
-        cout << "Duration: " << current->duration << endl;
-        current = current->next;
-    }
-}
-
-// Delete the nodes in the linked list
-void deleteList(Client** headRef) {
-    Client* current = *headRef;
-    while (current != nullptr) {
-        Client* temp = current;
-        current = current->next;
-        delete temp;
-    }
-    *headRef = nullptr;
-}
-
-void appendToList(Client** headRef, int time, int numC, int duration) {
-    Client* newNode = new Client;
-    newNode->time = time;
-    newNode->numC = numC;
-    newNode->duration = duration;
-    newNode->next = nullptr;
-
-    if (*headRef == nullptr) {
-        *headRef = newNode;
-    }
-    else {
-        Client* current = *headRef;
-        while (current->next != nullptr) {
-            current = current->next;
-        }
-        current->next = newNode;
-    }
-}
-
-// checks whether the linked list is empty
-bool checkIfListIsEmpty(Client* head) {
-    if (head == nullptr) {
-        // cout << "Linked list is empty" << endl;
-        return true;
-    }
-    else {
-        // cout << "Linked list is not empty" << endl;
-        return false;
-    }
-}
-
-void deleteFirstElement(Client** headRef) {
-    if (checkIfListIsEmpty(*headRef) == true) {
-        return;
-    }
-    Client* temp = *headRef;
-    *headRef = (*headRef)->next;
-    delete temp;
-}
-
-// Definition of a OutputList struct with an integer value and a pointer to the next Node. Used to construct a linked list.
-//! We need this, so we can sort the client list by the their end of service time. IDK how else this would be done.
-struct OutputList {
-    int spentTime;
-    int barberNum;
-    int clientNum;
-    OutputList* next;
-};
-
-void traverseList(OutputList* head) {
-    OutputList* current = head;
-    while (current != nullptr) {
-        cout << "Spent Time: " << current->spentTime << ", ";
-        cout << "Barber Num: " << current->barberNum << ", ";
-        cout << "Client Num: " << current->clientNum << endl;
-        current = current->next;
-    }
-}
-
-void addElement(OutputList** headRef, int spentTime, int barberNum, int clientNum) {
-    OutputList* newNode = new OutputList;
-    newNode->spentTime = spentTime;
-    newNode->barberNum = barberNum;
-    newNode->clientNum = clientNum;
-    newNode->next = nullptr;
-
-    if (*headRef == nullptr) {
-        *headRef = newNode;
-    }
-    else {
-        OutputList* current = *headRef;
-        while (current->next != nullptr) {
-            current = current->next;
-        }
-        current->next = newNode;
-    }
-}
-
-void deleteList(OutputList** headRef) {
-    OutputList* current = *headRef;
-    while (current != nullptr) {
-        OutputList* temp = current;
-        current = current->next;
-        delete temp;
-    }
-    *headRef = nullptr;
-}
-
-// This function takes a reference to the head of an OutputList and sorts the list in ascending order based on the spentTime variable and barberNum. It uses a modified selection sort algorithm where the minimum element is repeatedly found and swapped with the current element.
-/*
-void sortList(OutputList** headRef) {
-    if (*headRef == nullptr || (*headRef)->next == nullptr) {
-        // List is already sorted (or empty)
-        return;
-    }
-
-    OutputList* sortedList = nullptr;
-    OutputList* current = *headRef;
-
-    while (current != nullptr) {
-        OutputList* next = current->next;
-
-        if (sortedList == nullptr || current->spentTime < sortedList->spentTime) {
-            // Insert at the beginning of the sorted list
-            current->next = sortedList;
-            sortedList = current;
-        }
-        else {
-            // Traverse the sorted list to find the correct position to insert
-            OutputList* temp = sortedList;
-            while (temp->next != nullptr && current->spentTime >= temp->next->spentTime) {
-                temp = temp->next;
-            }
-            // Insert the current node at the correct position in the sorted list
-            current->next = temp->next;
-            temp->next = current;
-        }
-        current = next;
-    }
-    // Update the head of the original list to point to the sorted list
-    *headRef = sortedList;
-}
-*/
-// Sort of works
-//! Still have to figure out how to track time properly and reflect that in the code
-/*
-For example, this doesn't work properly.
-2
-10 1 10
-11 1 9
-12 1 8
-0
-*/
-void sortList(OutputList** headRef) {
-    if (*headRef == nullptr || (*headRef)->next == nullptr) {
-        // List is already sorted (or empty)
-        return;
-    }
-
-    OutputList* sortedList = nullptr;
-    OutputList* current = *headRef;
-
-    while (current != nullptr) {
-        OutputList* next = current->next;
-
-        if (sortedList == nullptr || current->spentTime < sortedList->spentTime ||
-            (current->spentTime == sortedList->spentTime && current->barberNum < sortedList->barberNum)) {
-            // Insert at the beginning of the sorted list
-            current->next = sortedList;
-            sortedList = current;
-        }
-        else {
-            // Traverse the sorted list to find the correct position to insert
-            OutputList* temp = sortedList;
-            while (temp->next != nullptr && (current->spentTime > temp->next->spentTime ||
-                                              (current->spentTime == temp->next->spentTime && current->barberNum > temp->next->barberNum))) {
-                temp = temp->next;
-            }
-            // Insert the current node at the correct position in the sorted list
-            current->next = temp->next;
-            temp->next = current;
-        }
-        current = next;
-    }
-    // Update the head of the original list to point to the sorted list
-    *headRef = sortedList;
-}
-
-
-
-
-
-
+// Nosaka, vai barberis ir derīgs, skatoties uz dažādiem vairantiem, kad klients varētu atnākt un vai viņa pauze viņam kko sapisīs. Skaties image.png.
 bool valid(int barberNum, int time, int duration){
     int hundrethPlace = (time / 100) % 10;
     int hundrethPart = time % 1000;
@@ -385,7 +114,7 @@ int main() {
 
     Barber* current = head;
 
-    // Atrod derīgo barberi.
+    //! ŠIS VISS IR PIRMAJAM ELEMENTAM Atrod derīgo barberi.
     while(true) {
         if(current == nullptr){
             // exit(1);
@@ -408,14 +137,16 @@ int main() {
         }        
     }
 
+
+    // ! ŠIS VISS IR NĀKAMAJIEM ELEMENTIEM
     while (input >> time >> clientNum >> duration) {
-        if (time == 0) break;
+        if (time == 0) break; // Tātad fails beidzās
         current = head;
-        if (time < currentTime+1){
+        if (time < currentTime+1){ // Ātrākais brīdis, kad klientu barberis var apkalpot ķip
             time = currentTime+1;
             currentTime = time;
         }
-        // Atbrīvot busy: salīdzini currentTime ar vinu lastWorkTime
+        // Atbrīvot busy: salīdzini time ar vinu lastWorkTime
         while(current != nullptr && current->lastWorkTime < time){
             if (current->busy == true) {
                 current->busy = false;
@@ -424,15 +155,13 @@ int main() {
             current = current->next;
         }
         current = head;
-        // cout << boolalpha << current->busy << endl << current->numB << endl << current->client << endl << current->lastWorkTime << endl << current->next << endl; 
-        // cout << boolalpha << current->next->busy << endl << current->next->numB << endl << current->next->client << endl << current->next->lastWorkTime << endl << current->next << endl; 
         bool busyExists = false;
         while(true) {
            
             if(current == nullptr){
-                // tikai brivie
-                // tikai aiznemtie
-                // abi  
+                // tikai brivie frizieri
+                // tikai aiznemtie frizieri
+                // abi kopā sarakstā.
                 if (busyExists == false){
                     // All not busy
                     time = (((time/100)*100)+100);
@@ -463,19 +192,21 @@ int main() {
                 }
 
                 current = head;
-                    while(current != nullptr && current->lastWorkTime < time){
-                        if (current->busy == true) {
-                            if (current->next == nullptr) {
-                                busyExists = false;
-                            }
-                            current->busy = false;
-                            output << current->lastWorkTime << " " << current->numB << " " << current->client << endl;
-                        
-                            
+                while(current != nullptr && current->lastWorkTime < time){
+                    // Ja ir currentam ir beidzies tas iepriekšējais klienta apkalpošana
+                    if (current->busy == true) {
+                        // Ja next ir nullptr, tad lists ie beidzies.
+                        if (current->next == nullptr) {
+                            // Un tas nozīmē, ka neeksistē vairs neviens busy barber, so nomainam busyExists uz false, jo no busy exist.
+                            busyExists = false;
                         }
-                        current = current->next;
+                        // Ja tas nav vēl beidzies, tad vnk nomainam viņa busy uz false uz sūtam pabeigtā klienta datus prom.
+                        current->busy = false;
+                        output << current->lastWorkTime << " " << current->numB << " " << current->client << endl;
                     }
-                    current = head;
+                    current = current->next;
+                }
+                current = head;
             }
             if (current->busy == true){
                 busyExists = true;
@@ -498,6 +229,7 @@ int main() {
         }    
     }
     current = head;
+    // Kas viss beidzies, vnk iztukšo arī tos, kas vēl bija busy.
     while(current != nullptr){
             if (current->busy == true) {
                 output << current->lastWorkTime << " " << current->numB << " " << current->client << endl;
