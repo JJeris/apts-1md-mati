@@ -179,7 +179,7 @@ int main() {
                         while (current->busy != true) {
                             current = current->next;
                         }
-                        // Both busy
+                        // Both busy and not busy
                         if (time/100*100+100<current->lastWorkTime+1) {
                             currentTime = time/100*100+100;
                             time = currentTime;    
