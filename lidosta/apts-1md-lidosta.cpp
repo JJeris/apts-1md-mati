@@ -1,23 +1,24 @@
 #include <fstream>
 using namespace std;
 // Author: Johans Justs Eris, je21033
-// AVL tree implementation in C++ from https://www.programiz.com/dsa/avl-tree with some
 
-class Node
+// AVL tree implementation in C++ from https://www.programiz.com/dsa/avl-tree with some minor improvements.
+
 // Each node represetns each flight, that is detailed in the input file.
+class Node
 {
 public:
     int key; // Take off time
     Node *left;
     Node *right;
     int height; // Height
-    int ielidosanasLaiks = -1; // Landing time
+    int landingTime = -1; // Landing time
     int destinationAirport = -1; // The airport to which the flight is going to
 };
 
 int max(int a, int b);
 
-// Calculate height
+// Returns the height of a node
 int height(Node *N)
 {
     if (N == NULL)
@@ -38,7 +39,7 @@ Node *newNode(int key, int landingTime, int destinationAirport)
     node->left = NULL;
     node->right = NULL;
     node->height = 1;
-    node->ielidosanasLaiks = landingTime;
+    node->landingTime = landingTime;
     node->destinationAirport = destinationAirport;
     return (node);
 }
@@ -85,6 +86,8 @@ int getBalanceFactor(Node *N)
 }
 
 // Insert a node
+// We insert a new flight corresponding to its take off airport (node). 
+// Key is the time of takeoff, landingTime is landing time and destinationAirport is our destination.
 Node *insertNode(Node *node, int key, int landingTime, int destinationAirport)
 {
     // Find the correct postion and insert the node
@@ -129,7 +132,7 @@ Node *insertNode(Node *node, int key, int landingTime, int destinationAirport)
     return node;
 }
 
-// Node with minimum value
+// Returns the node with the minimum value.
 Node *nodeWithMimumValue(Node *node)
 {
     Node *current = node;
@@ -138,7 +141,8 @@ Node *nodeWithMimumValue(Node *node)
     return current;
 }
 
-// Delete a node
+// After a flight has been flown, we delete it off of its AVL tree.
+// This ensures that we don't use a flight again.
 Node *deleteNode(Node *root, int key)
 {
     // Find the node and delete it
@@ -168,7 +172,7 @@ Node *deleteNode(Node *root, int key)
             Node *temp = nodeWithMimumValue(root->right);
             root->key = temp->key;
             root->destinationAirport = temp->destinationAirport;
-            root->ielidosanasLaiks = temp->ielidosanasLaiks;
+            root->landingTime = temp->landingTime;
             root->right = deleteNode(root->right,
                                      temp->key);
         }
@@ -209,40 +213,39 @@ Node *deleteNode(Node *root, int key)
     return root;
 }
 
-// Function to find the smallest possible element in an AVL tree
-// that is greater than a passed value
-Node *findSmallestGreaterThan(Node *root, int izlidosana)
+// Function to find the smallest possible flight departure time in an AVL tree
+// that is greater than the passed currentTime.
+Node *findSonnestFlight(Node *indexRoot, int currentTime)
 {
-    // Initialize the result variable
-    Node *result = nullptr;
-
+    // Initialize the result node
+    Node *resultFlight = nullptr;
     // Traverse the tree to find the smallest element greater than the value
-    while (root != nullptr)
+    while (indexRoot != nullptr)
     {
-        if (root->key > izlidosana)
+        if (indexRoot->key > currentTime)
         {
-            result = root;
-            root = root->left;
+            resultFlight = indexRoot;
+            indexRoot = indexRoot->left;
         }
         else
         {
-            root = root->right;
+            indexRoot = indexRoot->right;
         }
     }
-
-    // Return the result
-    return result;
+    // Return the node with the minimum departure time
+    return resultFlight;
 }
-// Ja nav neviens lielāks par current time, tad jāskatās uz mazāko nākamo reisu tā, it kā viņš ir notiek nākamajā dienā.
 
+// A type of node, with wich a static array is created, 
+// that stores the resulting output.
 struct resultNode
 {
-    // An element, that represents a node in a binary tree.
     int from = -1;
     int to = -1;
-    int izlidosanasLaiks = -1;
-    int ielidosanasLaiks = -1;
+    int takeOffTime = -1;
+    int landingTime = -1;
 };
+
 
 int main()
 {
@@ -257,18 +260,16 @@ int main()
     output.rdbuf()->pubsetbuf(buffer, length);
     output.open("lidostas.out");
 
-    // cout<<"ok1"<<endl;
-    //  Initialize variables.
     int numberOfAirports = 0;
     int startAirport = 0;
     int endAirport = 0;
-
     int startingTime = 0;
+    // An array of airports.
+    Node *airportArr[20001];
 
-    Node *lidostas[20001];
-
+    // Used for reading from the input file.
     int cursor = 0;
-    char line[20000];
+    char line[20000]; // The char array is 20000 long, so as to be able to read the worse case scenario inputs.
 
     // Read in the number of airports.
     input.getline(line, 20000);
@@ -279,7 +280,7 @@ int main()
     }
     cursor = 0;
 
-    // Read the start airports number
+    // Read in the start airports number
     input.getline(line, 20000);
     while (line[cursor] != ' ')
     {
@@ -287,7 +288,8 @@ int main()
         cursor++;
     }
     cursor++;
-    // Read the end airports number
+
+    // Read in the end airports number
     while (line[cursor] != '\0')
     {
         endAirport = endAirport * 10 + line[cursor] - '0';
@@ -297,13 +299,18 @@ int main()
     int hours = 0;
     int minutes = 0;
     cursor = 0;
+
     input.getline(line, 20000);
+
+    // Read in the hours
     while (line[cursor] != ':')
     {
         hours = hours * 10 + line[cursor] - '0';
         cursor++;
     }
     cursor++;
+
+    // Read in the minutes
     while (line[cursor] != '\0')
     {
         minutes = minutes * 10 + line[cursor] - '0';
@@ -312,20 +319,21 @@ int main()
 
     cursor = 0;
     startingTime = (hours * 60) + minutes;
-    // cout<<numberOfAirports<<", "<<startAirport<<", "<<endAirport<<", "<<startingTime<<endl;
-    // cout<<"ok2"<<endl;
+
+
+
+    // For the next flight times.
     input.getline(line, 20000);
     while (true)
     {
-
-        if (line[cursor] == '0')
+        if (line[cursor] == '0') // If the file has ended, we break from the while loop.
         {
             break;
         }
-        // No kura reisa
-        int from = 0;
-        int to = 0;
-        int n = 0;
+
+        int from = 0; // From which airport
+        int to = 0; // To which airport
+        int n = 0; // How many such flights exist?
         while (line[cursor] != ' ')
         {
             from = from * 10 + line[cursor] - '0';
@@ -345,12 +353,11 @@ int main()
         }
         cursor++;
 
+        // Time variables, that'll be read in from the remaining length of the read in line.
         int startHour = 0;
         int startMinute = 0;
         int endHour = 0;
         int endMinute = 0;
-
-        // cout<<from<<", "<<to<<", "<<n<<endl;
 
         for (int i = 0; i < n; i++)
         {
@@ -372,6 +379,10 @@ int main()
                 cursor++;
             }
             cursor++;
+
+            // We declare a count variable, that helps us exit the next while loop.
+            // Without it we wouldn't be able to finish the reading process, unless altering
+            // the code in another way. Thiw was a simple and reasonable fix.
             int count = 0;
             while (count != 2)
             {
@@ -381,11 +392,14 @@ int main()
             }
             cursor++;
 
+            // Once we have finishing reading the times from a flight, we input its information
+            // into the corresponding index AVL tree.
+            // First we convert the time into minutes, so as to make the data useable.
             int izlidosana = (startHour * 60) + startMinute;
             int ielidosana = (endHour * 60) + endMinute;
-            // cout<<"Insert: "<< from << ", " << izlidosana << ", " << ielidosana << ", " << to << endl;
-            lidostas[from] = insertNode(lidostas[from], izlidosana, ielidosana, to);
+            airportArr[from] = insertNode(airportArr[from], izlidosana, ielidosana, to);
 
+            // Reset all values
             startHour = 0;
             startMinute = 0;
             endHour = 0;
@@ -393,125 +407,164 @@ int main()
             izlidosana = 0;
             ielidosana = 0;
             count = 0;
-            // Saglabā reisu
-            // Pievienot node
         }
+        
+        // Once there are no more flight left, we reset the rest of the values and read in the next line.
         from = 0;
         to = 0;
         n = 0;
         cursor = 0;
         input.getline(line, 20000);
     }
-    // cout<<"M: Before aiziet dirsā!"<<endl;
-    resultNode resultArray[20001];
-    int resultInterator = 0;
+    
+    // Once the input files is empty, we move on to finding the path from the starting airport to the end airport.
+    resultNode resultArray[20001]; // An array that hold out ouput.
+    int resultInterator = 0; // An iterator for our array.
+
+    // Initialize the first element of out array, since it is unique.
     resultArray[resultInterator].from = startAirport;
-    resultArray[resultInterator].izlidosanasLaiks = startingTime;
+    resultArray[resultInterator].takeOffTime = startingTime;
     resultInterator++;
 
-    // startingTime+=node->key;
-    // findSmallestGreater(lidostas[startAirport], startingTime);-
-    Node *node = findSmallestGreaterThan(lidostas[startAirport], startingTime);
+    // We find the node (flight) which will be flying the soonest, 
+    // depending on out startingTime for the search
+    Node *node = findSonnestFlight(airportArr[startAirport], startingTime);
+    // If no flight was found, it means that the flight might be leaving the next day.
+    // We set the startingTime argument in the function call to -1 or any other negative value.
     if (node == NULL)
     {
-        node = findSmallestGreaterThan(lidostas[startAirport], -1);
+        node = findSonnestFlight(airportArr[startAirport], -1);
     }
 
     while (true)
-    {
+    {   
+        // Make sure to save the startAirport, that we will use
+        // when deleting the node.
         int originalStartAirport = startAirport;
+
+        // If we get stuck at an airport, that has no outgoing flights left,
+        // we output "Impossible" and break frim the loop. This means, that 
+        // findSoonestFlight returned a NULL flight.
         if (node == NULL)
         {
             output << "Impossible";
             break;
         }
+        // IF we have arrived at out destination airport, 
+        // then we can begin to output our stored results.
         else if (node->destinationAirport == endAirport)
         {
-            // izvade
+            // We first write in the results from our last node, before outputing
+            // the whole array into our output file.
             resultArray[resultInterator].from = startAirport;
             resultArray[resultInterator].to = node->destinationAirport;
-            resultArray[resultInterator].izlidosanasLaiks = node->key;
-            resultArray[resultInterator].ielidosanasLaiks = node->ielidosanasLaiks;
+            resultArray[resultInterator].takeOffTime = node->key;
+            resultArray[resultInterator].landingTime = node->landingTime;
+            
+            // We iterate for every element in out array.
             for (int k = 0; k <= resultInterator; k++)
             {
-                if (k == 0)
+                // If k equals 0, we then out the first line of our output file
+                // which is rather unique.
+                if (k == 0) 
                 {
-                    // timeStart
+                    // In case the hours or minutes are less than 10 (are not double digit),
+                    // we output a "0" to make sure the fomratting stays correct.
                     output << resultArray[k].from << " ";
-                    if (resultArray[k].izlidosanasLaiks / 60 < 10)
+                    if (resultArray[k].takeOffTime / 60 < 10)
                     {
-                        output << "0" << resultArray[k].izlidosanasLaiks / 60 << ":";
+                        output << "0" << resultArray[k].takeOffTime / 60 << ":";
                     }
                     else
                     {
-                        output << resultArray[k].izlidosanasLaiks / 60 << ":";
+                        output << resultArray[k].takeOffTime / 60 << ":";
                     }
-                    if (resultArray[k].izlidosanasLaiks % 60 < 10)
+                    if (resultArray[k].takeOffTime % 60 < 10)
                     {
-                        output << "0" << resultArray[k].izlidosanasLaiks % 60 << '\n';
+                        output << "0" << resultArray[k].takeOffTime % 60 << '\n';
                     }
                     else
                     {
-                        output << resultArray[k].izlidosanasLaiks % 60 << '\n';
+                        output << resultArray[k].takeOffTime % 60 << '\n';
                     }
                 }
+                // When we're passed the first element of out array
+                // the rest of the elements are outputed the same way.
                 else
                 {
                     output << resultArray[k].from << "->" << resultArray[k].to << " ";
-                    if (resultArray[k].izlidosanasLaiks / 60 < 10)
+                    if (resultArray[k].takeOffTime / 60 < 10)
                     {
-                        output << "0" << resultArray[k].izlidosanasLaiks / 60 << ":";
+                        output << "0" << resultArray[k].takeOffTime / 60 << ":";
                     }
                     else
                     {
-                        output << resultArray[k].izlidosanasLaiks / 60 << ":";
+                        output << resultArray[k].takeOffTime / 60 << ":";
                     }
-                    if (resultArray[k].izlidosanasLaiks % 60 < 10)
+                    if (resultArray[k].takeOffTime % 60 < 10)
                     {
-                        output << "0" << resultArray[k].izlidosanasLaiks % 60 << '-';
-                    }
-                    else
-                    {
-                        output << resultArray[k].izlidosanasLaiks % 60 << '-';
-                    }
-                    if (resultArray[k].ielidosanasLaiks / 60 < 10)
-                    {
-                        output << "0" << resultArray[k].ielidosanasLaiks / 60 << ":";
+                        output << "0" << resultArray[k].takeOffTime % 60 << '-';
                     }
                     else
                     {
-                        output << resultArray[k].ielidosanasLaiks / 60 << ":";
+                        output << resultArray[k].takeOffTime % 60 << '-';
                     }
-                    if (resultArray[k].ielidosanasLaiks % 60 < 10)
+                    if (resultArray[k].landingTime / 60 < 10)
                     {
-                        output << "0" << resultArray[k].ielidosanasLaiks % 60 << '\n';
+                        output << "0" << resultArray[k].landingTime / 60 << ":";
                     }
                     else
                     {
-                        output << resultArray[k].ielidosanasLaiks % 60 << '\n';
+                        output << resultArray[k].landingTime / 60 << ":";
+                    }
+                    if (resultArray[k].landingTime % 60 < 10)
+                    {
+                        output << "0" << resultArray[k].landingTime % 60 << '\n';
+                    }
+                    else
+                    {
+                        output << resultArray[k].landingTime % 60 << '\n';
                     }
                 }
             }
             break;
         }
 
+        // If we have not reached out destination, we simply update the resultArray 
+        // and move on.
         else
         {
             resultArray[resultInterator].from = startAirport;
             resultArray[resultInterator].to = node->destinationAirport;
-            resultArray[resultInterator].izlidosanasLaiks = node->key;
-            resultArray[resultInterator].ielidosanasLaiks = node->ielidosanasLaiks;
+            resultArray[resultInterator].takeOffTime = node->key;
+            resultArray[resultInterator].landingTime = node->landingTime;
         }
-        startingTime = node->ielidosanasLaiks;
+
+        // We update the startingTime to be relavent
+        startingTime = node->landingTime;
+        // We change our starAirport to the next one that we'll start from
+        // in the next iteration.
         startAirport = resultArray[resultInterator].to;
         resultInterator++;
-        lidostas[originalStartAirport] = deleteNode(lidostas[originalStartAirport], node->key);
-        node = findSmallestGreaterThan(lidostas[startAirport], startingTime);
+
+        // We delete the flight we just used
+        airportArr[originalStartAirport] = deleteNode(airportArr[originalStartAirport], node->key);
+        
+        // We find the next soonest flight
+        node = findSonnestFlight(airportArr[startAirport], startingTime);
+        // Again, If no flight was found, it means that the flight might be leaving the next day.
+        // We set the startingTime argument in the function call to -1 or any other negative value.
         if (node == NULL)
         {
-            node = findSmallestGreaterThan(lidostas[startAirport], -1);
+            node = findSonnestFlight(airportArr[startAirport], -1);
         }
     }
+
+    // Delete the node
+    delete node;
+
+    // Close the files.
     input.close();
     output.close();
+
 }
