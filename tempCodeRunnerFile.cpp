@@ -1,2 +1,1 @@
-!= 0)
-        if (time == 0)
+time+duration-1
